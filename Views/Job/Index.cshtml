@@ -1,0 +1,68 @@
+﻿@model IEnumerable<TechJobPortal.Models.JobListing>
+@{
+    // Retrieve the selected job type
+    var selectedJobType = ViewBag.JobType as TechJobPortal.Models.JobType?;
+    // Retrieve the sort order
+    var sortOrder = ViewBag.SortOrder as string;
+    // Retrieve the search string
+    var searchString = ViewBag.SearchString as string;
+    // Retrieve the job types
+    var jobTypes = Enum.GetValues(typeof(TechJobPortal.Models.JobType)).Cast<TechJobPortal.Models.JobType>();
+}
+
+<h1>Job Listings</h1>
+
+<div class="row">
+    <!-- Filter Form -->
+    <div class="col-md-6">
+        <form method="get" asp-action="Index">
+            <div class="form-group">
+                <label for="jobTypeFilter">Filter by Job Type</label>
+                <select id="jobTypeFilter" name="jobType" class="form-control">
+                    <option value="">All</option>
+                    @foreach (var jobType in jobTypes)
+                    {
+                        // Check if the job type is selected, if so, set the selected attribute
+                        <option value="@((int)jobType)" selected="@(selectedJobType == jobType ? "selected" : null)">@jobType</option>
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+    </div>
+
+    <!-- Sort Form -->
+    <div class="col-md-6">
+        <form method="get" asp-action="Index">
+            <div class="form-group">
+                <label for="sortOrder">Sort by Date</label>
+                <select id="sortOrder" name="sortOrder" class="form-control">
+                    <option value="date_desc" selected="@(sortOrder == "date_desc" ? "selected" : null)">Newest First</option>
+                    <option value="date_asc" selected="@(sortOrder == "date_asc" ? "selected" : null)">Oldest First</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Sort</button>
+        </form>
+    </div>
+</div>
+
+<!-- Search Form -->
+<form method="get" asp-action="Index" class="mt-3">
+    <div class="form-group">
+        <label for="searchString">Search</label>
+        <input type="text" id="searchString" name="searchString" class="form-control" value="@searchString" placeholder="Search by title or company name" />
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<div class="list-group mt-3">
+    @foreach (var job in Model)
+    {
+        // Display the job details as a list group item
+        <a href="@Url.Action("Details", new { id = job.Id })" class="list-group-item list-group-item-action">
+            <h5 class="mb-1">@job.Title</h5>
+            <p class="mb-1">@job.CompanyName</p>
+            <small>Posted on: @job.PostedDate.ToString("MMM dd, yyyy")</small>
+        </a>
+    }
+</div>
